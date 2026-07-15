@@ -1,0 +1,9 @@
+# Store text files using Linux line endings
+* text=auto eol=lf
+
+# Treat common image formats as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary

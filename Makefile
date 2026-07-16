@@ -76,3 +76,39 @@ quality: format-check lint type-check test
 clean:
 >rm -rf .coverage .mypy_cache .pytest_cache .ruff_cache htmlcov
 >find . -type d -name __pycache__ -prune -exec rm -rf {} +
+
+# Local Docker Compose infrastructure
+COMPOSE_CMD := env -u COMPOSE_FILE docker compose --project-directory "$(CURDIR)" --env-file "$(CURDIR)/.env" --file "$(CURDIR)/compose.yaml"
+
+.PHONY: infra-config infra-pull infra-up infra-status infra-logs infra-down infra-reset infra-check postgres-shell redis-shell
+
+infra-config:
+>$(COMPOSE_CMD) config --quiet
+
+infra-pull:
+>$(COMPOSE_CMD) pull
+
+infra-up: infra-config
+>$(COMPOSE_CMD) up -d --wait
+
+infra-status:
+>$(COMPOSE_CMD) ps
+
+infra-logs:
+>$(COMPOSE_CMD) logs --tail=100 -f
+
+infra-down:
+>$(COMPOSE_CMD) down --remove-orphans
+
+infra-reset:
+>test "$(CONFIRM)" = "YES" || { echo "ERROR: this deletes all local database data"; echo "Run: make infra-reset CONFIRM=YES"; exit 1; }
+>$(COMPOSE_CMD) down --volumes --remove-orphans
+
+infra-check:
+>./scripts/check-checkpoint-2a.sh
+
+postgres-shell:
+>$(COMPOSE_CMD) exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+
+redis-shell:
+>$(COMPOSE_CMD) exec redis redis-cli

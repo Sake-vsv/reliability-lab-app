@@ -81,3 +81,41 @@ restarts. This is intentional for the first milestone.
 ## License
 
 MIT
+
+## Local data services
+PostgreSQL and Redis run locally through Docker Compose.
+Validate the Compose configuration:
+```bash
+make infra-config
+```
+Start the services and wait for their health checks:
+```bash
+make infra-up
+```
+Check their current status:
+```bash
+make infra-status
+```
+Run functional infrastructure checks:
+```bash
+make infra-check
+```
+Follow service logs:
+```bash
+make infra-logs
+```
+Stop and remove containers while preserving database volumes:
+```bash
+make infra-down
+```
+Permanently remove containers and local database volumes:
+```bash
+make infra-reset CONFIRM=YES
+```
+The reset operation is destructive.
+Local endpoints:
+```text
+PostgreSQL: 127.0.0.1:5432
+Redis:      127.0.0.1:6379
+```
+Both services are bound only to the local loopback interface.
